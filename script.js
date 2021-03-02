@@ -172,7 +172,7 @@ header.prepend(message); // prepend adds element as a forst child
   .addEventListener('click', function () {
     //message.remove();
   });
-
+// /////////////////
 // Styles are set into html as inline styles
 message.style.backgroundColor = '#37383d';
 message.style.width = '120%';
