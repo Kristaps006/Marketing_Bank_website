@@ -9,6 +9,10 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+const nav = document.querySelector('.nav');
 
 ///////////////////////////////////////////////////////
 
@@ -74,10 +78,6 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 
 ////TAPPED COMPONENTS////////////////
 
-const tabs = document.querySelectorAll('.operations__tab');
-const tabsContainer = document.querySelector('.operations__tab-container');
-const tabsContent = document.querySelectorAll('.operations__content');
-
 tabsContainer.addEventListener('click', function (e) {
   const clicked = e.target.closest('.operations__tab');
   console.log(clicked);
@@ -98,6 +98,119 @@ tabsContainer.addEventListener('click', function (e) {
     .querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add('operations__content--active');
 });
+
+///////////////// MENU FADE ANIMATION
+
+const handleHover = function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => (el !== link ? (el.style.opacity = this) : ''));
+    logo.style.opacity = this;
+  }
+};
+
+//Passing 'argument' into the handler
+
+nav.addEventListener('mouseover', handleHover.bind(0.5));
+
+nav.addEventListener('mouseout', handleHover.bind(1));
+
+/////////////////  STICKY NAVIGATION ///////////////////
+/* const initialCoords = section1.getBoundingClientRect(); // we get the whole size of section
+
+window.addEventListener('scroll', e => {
+  if (window.scrollY > initialCoords.top) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+});
+ */
+
+// STICKY NAVIGATION INTERSECTION OBSERVER API -
+
+/* const obsCallback = function (entries, observer) {
+  entries.forEach(entry => {
+    console.log(entry);
+  });
+};
+
+const obsOptions = {
+  root: null,
+  threshold: [0, 0.2],
+};
+
+const observer = new IntersectionObserver(obsCallback, obsOptions);
+observer.observe(section1); */
+
+const header = document.querySelector('.header');
+const navHeight = nav.getBoundingClientRect().height;
+
+const stickyNav = entries => {
+  const [entry] = entries; // we deconsturct to get the forst element out , teh same as writtin entires[0]
+  if (!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+};
+
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null,
+  treshold: 0,
+  rootMargin: `-${navHeight}px`, // this will be applied to get extra space for header , it is the height of navigation
+});
+
+headerObserver.observe(header);
+
+//////////////////   REVEAL SECTIONS //////////////////
+
+const allSection = document.querySelectorAll('.section');
+
+const revealSection = (entries, observer) => {
+  const [entry] = entries;
+  if (!entry.isIntersecting) return;
+
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
+
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+
+allSection.forEach(section => {
+  // Here we observer all the sections
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
+
+/// LAZY LOADING IMAGES
+
+const imgTargets = document.querySelectorAll('img[data-src]');
+
+const loadImg = (entries, observer) => {
+  const [entry] = entries;
+  if (!entry.isIntersecting) return;
+
+  // replace src with data-src
+
+  entry.target.src = entry.target.dataset.src;
+
+  // we liste for load event
+  entry.target.addEventListener('load', e => {
+    entry.target.classList.remove('lazy-img');
+  });
+
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  treshold: 0,
+  rootMargin: '200px',
+});
+
+imgTargets.forEach(img => imgObserver.observe(img));
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
