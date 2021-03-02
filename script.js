@@ -7,7 +7,12 @@ const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
+const btnScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
 
+///////////////////////////////////////////////////////
+
+//Modal window
 const openModal = function (e) {
   e.preventDefault();
   modal.classList.remove('hidden');
@@ -29,6 +34,89 @@ document.addEventListener('keydown', function (e) {
     closeModal();
   }
 });
+
+///////////////////////////////////////////////////
+//BUTTON SCROLLING
+
+btnScrollTo.addEventListener('click', function (e) {
+  const s1coords = section1.getBoundingClientRect(); //  getBoundingClientRect gives you coordinates
+  section1.scrollIntoView({ behavior: 'smooth' });
+});
+
+//////////////////////////
+//PAGE NAVIGATION
+
+/* document.querySelectorAll('.nav__link').forEach(function (el) {
+  el.addEventListener('click', function (e) {
+    e.preventDefault();
+    console.log('link');
+
+    const id = this.getAttribute('href');
+    console.log('id');
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+ */
+
+// we will use event delegation to attach to parent instead of
+//  1. Add event listener to common parent element
+// 2. Determine what eelemt originated the event from and
+
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  e.preventDefault();
+
+  //Matching Strategy
+  if (e.target.classList.contains('nav__link')) {
+    const id = e.target.getAttribute('href');
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+////TAPPED COMPONENTS////////////////
+
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+tabsContainer.addEventListener('click', function (e) {
+  const clicked = e.target.closest('.operations__tab');
+  console.log(clicked);
+
+  //Guard clause
+  if (!clicked) return;
+
+  //Active Tab
+
+  tabs.forEach(t => t.classList.remove('operations__tab--active'));
+  clicked.classList.add('operations__tab--active');
+
+  tabsContent.forEach(c => c.classList.remove('operations__content--active'));
+
+  // ACTIVATE CONTENT area
+
+  document
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
+});
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//_______LECTURES _-----------------
+
+//SMOOTH ___ SCROLLLING ---
+//bellow is 3 different ways of calculating smooth scrolling
+
+// window.scrollTo(
+//   s1coords.left + window.pageXOffset,
+//   s1coords.top + window.pageYOffset
+// );
+
+/*   window.scrollTo({
+    left: s1coords.left + window.pageXOffset,
+    top: s1coords.top + window.pageYOffset,
+    behavior: 'smooth',
+  });
+ */
 
 ///________________ SELECTING ELEMENTS____________________
 /* 
@@ -53,7 +141,7 @@ document.getElementsByClassName('btn') // also dont need selector .
 //--------------------------Creating and INserting ELEMENTS
 
 //.insertAdjacentHTML  -- need to look up
-
+/* 
 const header = document.querySelector('.header');
 
 const message = document.createElement('div');
@@ -68,7 +156,7 @@ header.prepend(message); // prepend adds element as a forst child
 
 // header.before(message);  // inserts before header
 // header.after(message);   // inserts after
-
+ */
 //____________DELETE ELEMENTS
 
 /* document
@@ -79,7 +167,7 @@ header.prepend(message); // prepend adds element as a forst child
 
 //____________________________________STYLES ATTRIBUTES AND CLASSSES ____________________________________
 
-document
+/* document
   .querySelector('.btn--close-cookie')
   .addEventListener('click', function () {
     //message.remove();
@@ -96,9 +184,9 @@ message.style.height =
   Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
 
 document.documentElement.style.setProperty('--color-primary', 'olive'); // This is the way to change properties
-
+ */
 //ATTRIBUTES________________--
-
+/* 
 const logo = document.querySelector('.nav__logo'); // SELECTING attributes
 console.log(logo.alt);
 console.log(logo.className);
@@ -131,3 +219,101 @@ logo.classList.contains('c');
 
 // Dont use it , it will overwrite everything
 logo.clasName = 'jonas';
+ */
+
+//___________EVENTS EVENT HANDLERS ________________________
+
+/* const h1 = document.querySelector('h1');
+
+const alertH1 = function (e) {
+  alert('addEventListener: Great u r reading heading ');
+};
+
+h1.removeEventListener('mouseenter', alertH1); // you can remove event listener , but need ti be in a function
+
+h1.addEventListener('mouseenter', function (e) {
+  alert('addEventListener: Great u r reading heading ');
+});
+
+h1.onmouseenter = function (e) {
+  alert('onmouseenter: Great u r reading heading ');
+};
+
+setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
+ */
+
+//___________EVENTS BUBLING & PROPAGATION________________________
+/* 
+// rbg(255, 255, 255)
+
+const randomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
+
+const randomColor = () =>
+  `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)},${randomInt(0, 255)})`;
+
+// e.target - where did the click happen
+// e.current target. it shows where did excactly did event happen
+// this keywords is also current target
+
+document.querySelector('.nav__link').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+
+  console.log('LINK', e.target, e.currentTarget);
+
+  // ---stopPropagation
+  // e.stopPropagation();   // IT stops the bubling and it does not effect parent elements
+});
+
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+
+  console.log('Container', e.target, e.currentTarget);
+});
+
+document.querySelector('.nav').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+
+  console.log('NAV', e.target, e.currentTarget);
+}, false);  //  set false to true  and event will not listen to bubbling. It will be first to get event handling. 
+
+
+
+ */
+
+//________________________DOM TRAVERSING ______________________________
+/* 
+const h1 = document.querySelector('h1');
+
+// GOing downwards: childs of h1
+
+console.log(h1.querySelectorAll('.highlight'));
+console.log(h1.childNodes);
+console.log(h1.children); // gives live Html collection
+
+h1.firstElementChild.style.color = 'red';
+h1.lastElementChild.style.color = 'blue';
+
+// Going Upwards - selecting parents
+
+console.log(h1.parentNode);
+console.log(h1.parentElement);
+
+h1.closest('.header').style.background = 'var(--gradient-secondary)';
+
+//h1.closest('.h1').style.background = 'var(--gradient-primary)'; // it will find itself
+
+// Selectin siblings :  going sideways h1
+
+console.log(h1.previousElementSibling);
+console.log(h1.nextElementSibling);
+
+console.log(h1.previousSibling);
+console.log(h1.nextSibling);
+
+console.log(h1.parentElement.children);
+[...h1.parentElement.children].forEach(function (el) {
+  console.log(el);
+  if (el !== h1) el.style.transform = 'scale(0.5)';
+});
+ */
